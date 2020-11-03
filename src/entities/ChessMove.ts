@@ -1,6 +1,7 @@
 import { Column, PrimaryGeneratedColumn, Entity, ManyToOne } from "typeorm";
 import { Side } from "../constants";
 import ChessBoard from "./ChessBoard";
+import GameSeries from "./GameSeries";
 
 /**
  * @swagger
@@ -29,6 +30,8 @@ import ChessBoard from "./ChessBoard";
  *         $ref: '#/definitions/ChessBoard'
  *       side:
  *         $ref: '#/components/Side'
+ *       gameSeries:
+ *         $ref: '#/definitions/GameSeries'
  *       qSroce:
  *         type: number
  */
@@ -61,6 +64,9 @@ class ChessMove {
 
   @ManyToOne(() => ChessBoard)
   toBoard: ChessBoard;
+
+  @ManyToOne(() => GameSeries, (gameSeries) => gameSeries.moves)
+  gameSeries: GameSeries;
 
   @Column({ type: "enum", enum: Object.values(Side) })
   side: Side;
