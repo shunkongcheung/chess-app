@@ -28,13 +28,13 @@ const PieceContainer = styled.div<{
 interface ChessBoardProps {
   board: Board;
   handleSelect?: (position: Position) => any;
-  selectedChese?: Position;
+  selectedChess?: Position;
 }
 
 const ChessBoard: React.FC<ChessBoardProps> = ({
   board,
   handleSelect,
-  selectedChese,
+  selectedChess,
 }) => {
   const boardWidth = board[0].length;
   const boardHeight = board.length;
@@ -47,11 +47,10 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
         : undefined;
 
       const isSelected =
-        selectedChese &&
-        rowIdx === selectedChese[0] &&
-        colIdx === selectedChese[1];
+        selectedChess &&
+        rowIdx === selectedChess[0] &&
+        colIdx === selectedChess[1];
 
-      console.log({ selectedChese, rowIdx, colIdx });
       return (
         <PieceContainer
           key={`boardPiece-${rowIdx}-${colIdx}`}
@@ -65,7 +64,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
         </PieceContainer>
       );
     },
-    [boardWidth]
+    [boardWidth, selectedChess]
   );
 
   const renderBoardRow = useCallback(
