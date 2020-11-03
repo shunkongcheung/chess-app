@@ -1,4 +1,4 @@
-import { Column, PrimaryGeneratedColumn, Entity } from "typeorm";
+import { Column, PrimaryGeneratedColumn, Entity, Index } from "typeorm";
 import { Side } from "../constants";
 
 /**
@@ -23,7 +23,8 @@ class ChessBoard {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
+  @Index()
   board: string;
 
   @Column({ type: "enum", enum: Object.values(Side) })
