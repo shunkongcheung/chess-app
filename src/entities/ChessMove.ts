@@ -1,4 +1,10 @@
-import { Column, PrimaryGeneratedColumn, Entity, ManyToOne } from "typeorm";
+import {
+  Column,
+  PrimaryGeneratedColumn,
+  Entity,
+  ManyToOne,
+  Unique,
+} from "typeorm";
 import { Side } from "../constants";
 import ChessBoard from "./ChessBoard";
 import GameSeries from "./GameSeries";
@@ -36,6 +42,7 @@ import GameSeries from "./GameSeries";
  *         type: number
  */
 
+@Unique("envAndAct", ["fromBoard", "fromRow", "fromCol", "toRow", "toCol"])
 @Entity()
 class ChessMove {
   @PrimaryGeneratedColumn()
