@@ -59,13 +59,15 @@ class ChessMove {
   @Column()
   toPiece: string;
 
-  @ManyToOne(() => ChessBoard)
+  @ManyToOne(() => ChessBoard, { onDelete: "CASCADE" })
   fromBoard: ChessBoard;
 
-  @ManyToOne(() => ChessBoard)
+  @ManyToOne(() => ChessBoard, { onDelete: "CASCADE" })
   toBoard: ChessBoard;
 
-  @ManyToOne(() => GameSeries, (gameSeries) => gameSeries.moves)
+  @ManyToOne(() => GameSeries, (gameSeries) => gameSeries.moves, {
+    onDelete: "CASCADE",
+  })
   gameSeries: GameSeries;
 
   @Column({ type: "enum", enum: Object.values(Side) })
