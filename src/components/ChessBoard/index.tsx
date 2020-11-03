@@ -7,6 +7,12 @@ type Board = Array<Array<string>>;
 
 type Position = [number, number];
 
+interface ChessBoardProps {
+  board: Board;
+  handleSelect?: (position: Position) => any;
+  selectedChess?: Position;
+}
+
 const Container = styled.div`
   position: relative;
   width: 100%;
@@ -24,12 +30,6 @@ const PieceContainer = styled.div<{
   width: ${({ widthPercent }) => widthPercent}%;
   height: 100%;
 `;
-
-interface ChessBoardProps {
-  board: Board;
-  handleSelect?: (position: Position) => any;
-  selectedChess?: Position;
-}
 
 const ChessBoard: React.FC<ChessBoardProps> = ({
   board,
