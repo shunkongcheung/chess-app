@@ -1,4 +1,5 @@
 import getAllNextPositions from "./getAllNextPositions";
+import getBoardFromHash from "./getBoardFromHash";
 import getBoardWinnerAndScore from "./getBoardWinnerAndScore";
 import getHashFromBoard from "./getHashFromBoard";
 import getInitialBoard from "./getInitialBoard";
@@ -8,6 +9,7 @@ import getIsPieceEmpty from "./getIsPieceEmpty";
 
 export {
   getAllNextPositions,
+  getBoardFromHash,
   getBoardWinnerAndScore,
   getHashFromBoard,
   getIsPieceEmpty,
