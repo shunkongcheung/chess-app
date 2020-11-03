@@ -13,7 +13,7 @@ import getGeneralNextPositions from "./getGeneralNextPositions";
 import getHorseNextPositions from "./getHorseNextPositions";
 import getJumboNextPositions from "./getJumboNextPositions";
 import getKnightNextPositions from "./getKnightNextPositions";
-import getSoldierNextPositions from "./getKnightNextPositions";
+import getSoldierNextPositions from "./getSoldierNextPositions";
 
 type Board = Array<Array<string>>;
 
@@ -31,6 +31,7 @@ const getPieceNextPositions = (board: Board, piecePosition: Position) => {
   };
   const piecePrefix = board[piecePosition[0]][piecePosition[1]].toUpperCase();
   const pieceFunc = funcs[piecePrefix];
+
   return pieceFunc(board, piecePosition);
 };
 
