@@ -1,15 +1,11 @@
 import { Column, PrimaryGeneratedColumn, Entity } from "typeorm";
-
-enum Side {
-  Top = "top",
-  Bottom = "bottom",
-}
+import { Side } from "../constants";
 
 /**
  * @swagger
  *
  * definitions:
- *   BoardStep:
+ *   ChessBoard:
  *     type: object
  *     properties:
  *       id:
@@ -17,16 +13,13 @@ enum Side {
  *       board:
  *         type: string
  *       side:
- *         type: string
- *         enum: [top, bottom]
+ *         $ref: '#/components/Side'
  *       simpleScore:
- *         type: number
- *       qScore:
  *         type: number
  */
 
 @Entity()
-class BoardStep {
+class ChessBoard {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -38,9 +31,6 @@ class BoardStep {
 
   @Column({ type: "integer" })
   simpleScore: number;
-
-  @Column({ type: "float" })
-  qScore: number;
 }
 
-export default BoardStep;
+export default ChessBoard;

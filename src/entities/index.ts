@@ -1,3 +1,4 @@
-import BoardStep from "./BoardStep";
+import ChessBoard from "./ChessBoard";
+import ChessMove from "./ChessMove";
 
-export { BoardStep };
+export { ChessBoard, ChessMove };
