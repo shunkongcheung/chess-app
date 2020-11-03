@@ -7,7 +7,6 @@ import {
 } from "typeorm";
 import { Side } from "../constants";
 import ChessBoard from "./ChessBoard";
-import GameSeries from "./GameSeries";
 
 /**
  * @swagger
@@ -36,8 +35,6 @@ import GameSeries from "./GameSeries";
  *         $ref: '#/definitions/ChessBoard'
  *       side:
  *         $ref: '#/components/Side'
- *       gameSeries:
- *         $ref: '#/definitions/GameSeries'
  *       qSroce:
  *         type: number
  */
@@ -72,16 +69,11 @@ class ChessMove {
   @ManyToOne(() => ChessBoard, { onDelete: "CASCADE" })
   toBoard: ChessBoard;
 
-  @ManyToOne(() => GameSeries, (gameSeries) => gameSeries.moves, {
-    onDelete: "CASCADE",
-  })
-  gameSeries: GameSeries;
+  @Column({ type: "integer" })
+  qScore: number;
 
   @Column({ type: "enum", enum: Object.values(Side) })
   side: Side;
-
-  @Column({ type: "integer" })
-  qScore: number;
 }
 
 export default ChessMove;
