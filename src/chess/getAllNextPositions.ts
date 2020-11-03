@@ -5,12 +5,23 @@ type Board = Array<Array<string>>;
 
 type Position = [number, number];
 
+interface Move {
+  from: Position;
+  to: Position;
+}
+
 const getAllNextPositions = (board: Board, isUpperSide: boolean) => {
   const positions = getFriendlyPiecePositions(board, isUpperSide);
 
-  let nextMoves: Array<Position> = [];
+  let nextMoves: Array<Move> = [];
   positions.map((position) => {
-    nextMoves = [...nextMoves, ...getPieceNextPositions(board, position)];
+    nextMoves = [
+      ...nextMoves,
+      ...getPieceNextPositions(board, position).map((to) => ({
+        from: position,
+        to,
+      })),
+    ];
   });
   return nextMoves;
 };
