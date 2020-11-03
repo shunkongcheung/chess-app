@@ -1,7 +1,7 @@
 import React, { memo } from "react";
 import styled from "styled-components";
 
-import { ChessBoard } from "../../components";
+import { Button, ChessBoard, ListItem, ListItemGroup } from "../../components";
 
 import {
   getMovedBoard,
@@ -17,15 +17,6 @@ interface Step {
   to: Position;
   target: string;
 }
-
-const Button = styled.button`
-  background: #f8f8f8;
-  border: 1px solid #ddd;
-  border-radius: 3px;
-  padding: 15px;
-  cursor: pointer;
-  width: 100px;
-`;
 
 const Container = styled.div`
   margin-left: auto;
@@ -47,18 +38,6 @@ const ChessCol = styled.div`
 const MoveCol = styled.div`
   margin-left: auto;
   width: 450px;
-`;
-
-const ListItemGroup = styled.ul`
-  list-style-type: none;
-  margin-top: 0;
-`;
-
-const ListItem = styled.li`
-  border: 1px solid #ccc;
-  padding: 20px;
-  display: flex;
-  justify-content: space-evenly;
 `;
 
 const ChessMove: React.FC = () => {
