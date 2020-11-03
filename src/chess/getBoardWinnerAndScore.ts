@@ -2,7 +2,7 @@ import { CHS_GENERAL, CHS_EMPTY } from "./constants";
 import getPieceScore from "./getPieceScore";
 type Board = Array<Array<string>>;
 
-const getBoardWinnerAndScore = (board: Board) => {
+const getBoardWinnerAndScore = (board: Board): [string, number] => {
   const winnerScore = 10000;
   let [total, isTGeneralExist, isBGeneralExist] = [0, false, false];
 
