@@ -17,7 +17,8 @@
     "styled-components": "^5.2.1",
     "swagger-jsdoc": "^5.0.0",
     "swagger-ui-react": "^3.36.1",
-    "typeorm": "^0.2.29"
+    "typeorm": "^0.2.29",
+    "yup": "^0.29.3"
   },
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.12.1",
@@ -25,6 +26,7 @@
     "@types/react": "^16.9.55",
     "@types/styled-components": "^5.1.4",
     "@types/swagger-ui-react": "^3.23.3",
+    "@types/yup": "^0.29.9",
     "babel-plugin-styled-components": "^1.11.1",
     "babel-plugin-transform-typescript-metadata": "^0.3.1",
     "prettier": "^2.1.2",
