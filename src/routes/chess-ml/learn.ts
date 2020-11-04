@@ -1,7 +1,7 @@
 import brain from "brain.js";
 import { Connection } from "typeorm";
 
-import { getBoardFromHash } from "../../chess";
+import { getBoardFromHash, getOneHotBoard } from "../../chess";
 import { Side } from "../../constants";
 import { ChessMlModel, ChessMove } from "../../entities";
 
@@ -13,7 +13,7 @@ const learn = async (connection: Connection) => {
 };
 
 const trainForSide = async (connection: Connection, side: Side) => {
-  const net = new brain.NeuralNetwork();
+  const net = new brain.NeuralNetworkGPU();
 
   const exist = await connection.getRepository(ChessMlModel).findOne({ side });
   if (exist) net.fromJSON(JSON.parse(exist.netModel));
@@ -24,22 +24,22 @@ const trainForSide = async (connection: Connection, side: Side) => {
   });
 
   if (side === Side.Bottom)
-    console.log(`There are ${chessMoves.length} training data set for ...`);
+    console.log(`There are ${chessMoves.length} training data set ...`);
 
   const datasets = chessMoves.map((chessMove) => ({
-    input: {
-      board: getBoardFromHash(chessMove.fromBoard.board),
-      move: {
-        from: [chessMove.fromRow, chessMove.fromCol],
-        to: [chessMove.toRow, chessMove.toCol],
-      },
-    },
-    output: chessMove.qScore,
+    input: [
+      ...getOneHotBoard(getBoardFromHash(chessMove.fromBoard.board)),
+      chessMove.fromRow,
+      chessMove.fromCol,
+      chessMove.toRow,
+      chessMove.toCol,
+    ],
+    output: { score: chessMove.qScore },
   }));
 
   await net.trainAsync(datasets, {
     callback: ({ iterations }) => {
-      if (iterations % 1000 === 0 && side === Side.Bottom)
+      if (iterations % 10 === 0 && side === Side.Bottom)
         console.log(`Training for ${iterations} times..`);
     },
   });
