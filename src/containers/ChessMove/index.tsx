@@ -40,6 +40,11 @@ const MoveCol = styled.div`
   width: 450px;
 `;
 
+const PositionListItem = styled(ListItem)`
+  display: flex;
+  justify-content: space-evenly;
+`;
+
 const ChessMove: React.FC = () => {
   const [board, setBoard] = React.useState(getInitialBoard());
   const [selectedChess, setSelectedChess] = React.useState<Position>([-1, -1]);
@@ -128,13 +133,13 @@ const ChessMove: React.FC = () => {
       <MoveCol>
         <ListItemGroup>
           {positions.map((position, idx) => (
-            <ListItem
+            <PositionListItem
               key={`ListItem-${idx}`}
               onClick={() => handleMoveSelect(idx)}
             >
               <div>{position[0]}</div>
               <div>{position[1]}</div>
-            </ListItem>
+            </PositionListItem>
           ))}
         </ListItemGroup>
       </MoveCol>
