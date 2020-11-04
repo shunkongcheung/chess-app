@@ -1,7 +1,12 @@
 import React, { memo } from "react";
 import styled from "styled-components";
 
-import { Button, ChessBoard, ListItem, ListItemGroup } from "../../components";
+import {
+  Button,
+  ChessBoard,
+  ListItemGroup,
+  MoveListItem,
+} from "../../components";
 
 import {
   getMovedBoard,
@@ -38,11 +43,6 @@ const ChessCol = styled.div`
 const MoveCol = styled.div`
   margin-left: auto;
   width: 450px;
-`;
-
-const PositionListItem = styled(ListItem)`
-  display: flex;
-  justify-content: space-evenly;
 `;
 
 const ChessMove: React.FC = () => {
@@ -133,13 +133,20 @@ const ChessMove: React.FC = () => {
       <MoveCol>
         <ListItemGroup>
           {positions.map((position, idx) => (
-            <PositionListItem
+            <MoveListItem
               key={`ListItem-${idx}`}
               onClick={() => handleMoveSelect(idx)}
-            >
-              <div>{position[0]}</div>
-              <div>{position[1]}</div>
-            </PositionListItem>
+              to={{
+                row: position[0],
+                col: position[1],
+                piece: board[position[0]][position[1]],
+              }}
+              from={{
+                row: selectedChess[0],
+                col: selectedChess[1],
+                piece: board[selectedChess[0]][selectedChess[1]],
+              }}
+            />
           ))}
         </ListItemGroup>
       </MoveCol>
