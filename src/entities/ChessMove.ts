@@ -69,7 +69,7 @@ class ChessMove {
   @ManyToOne(() => ChessBoard, { onDelete: "CASCADE" })
   toBoard: ChessBoard;
 
-  @Column({ type: "integer" })
+  @Column({ type: "float" })
   qScore: number;
 
   @Column({ type: "enum", enum: Object.values(Side) })
