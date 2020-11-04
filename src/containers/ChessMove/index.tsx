@@ -9,6 +9,7 @@ import {
 } from "../../components";
 
 import {
+  getHashFromBoard,
   getMovedBoard,
   getPieceNextPositions,
   getInitialBoard,
@@ -130,6 +131,7 @@ const ChessMove: React.FC = () => {
             Remove
           </Button>
         </ControlContainer>
+        <pre>{getHashFromBoard(board)}</pre>
       </ChessCol>
       <MoveCol>
         <ListItemGroup>
