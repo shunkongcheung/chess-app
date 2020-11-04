@@ -12,7 +12,7 @@ const jump = keyframes`
 			transform:0;
     }
     100% {
-			transform: translate(0, -5px);
+			transform: translate(0, -10px);
     }
 `;
 
@@ -21,7 +21,7 @@ const Container = styled.img<{ disable: boolean; isSelected: boolean }>`
   height: 100%;
   cursor: ${({ disable }) => (disable ? "auto" : "pointer")};
 
-  animation: ease-out ${({ isSelected }) => (isSelected ? jump : "")} 1s
+  animation: ease-in ${({ isSelected }) => (isSelected ? jump : "")} 0.7s
     infinite;
 `;
 
