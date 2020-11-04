@@ -1,6 +1,31 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import { NextApiRequest, NextApiResponse } from "next";
+import { getDbConnection } from "../../utils";
 
-export default (req, res) => {
-  res.statusCode = 200
-  res.json({ name: 'John Doe' })
-}
+// import brain from "brain.js";
+
+/**
+ * @swagger
+ *
+ * tags:
+ *   - name: Hello
+ *     description: Ping and check database connection is okay
+ *
+ * /hello:
+ *   get:
+ *     tags: [Hello]
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         schema:
+ *           type: object
+ *           properties:
+ *             hello:
+ *               type: number
+ *
+ */
+
+export default async (_: NextApiRequest, res: NextApiResponse) => {
+  await getDbConnection();
+  res.status(200).json({ hello: "world" });
+};
