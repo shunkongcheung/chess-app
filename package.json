@@ -9,6 +9,7 @@
     "swagger": "swagger-jsdoc -d swaggerDef.js && mv swagger.json ./public/."
   },
   "dependencies": {
+    "axios": "^0.21.0",
     "brain.js": "^2.0.0-beta.2",
     "next": "10.0.0",
     "pg": "^8.4.2",
