@@ -24,11 +24,16 @@ interface MoveSequenceItem {
   side: Side;
   from: Target;
   to: Target;
+  simpleScore: number;
 }
 
 interface GameSeriesProps {
   moveSequences: Array<MoveSequenceItem>;
 }
+
+const BoardDescContainer = styled.div`
+  margin-top: 15px;
+`;
 
 const Container = styled.div`
   margin-left: auto;
@@ -89,6 +94,9 @@ const GameSeries: React.FC<GameSeriesProps> = ({ moveSequences }) => {
     <Container>
       <ChessCol>
         <ChessBoard board={board} selectedChess={selectedChess} />
+        <BoardDescContainer>
+          Board Score: {moveSequences[step]?.simpleScore}
+        </BoardDescContainer>
         <ControlContainer>
           <Button disabled={step === 0} onClick={() => handleStepChange(-1)}>
             Backward
