@@ -43,6 +43,7 @@ const ChessCol = styled.div`
 const MoveCol = styled.div`
   margin-left: auto;
   width: 450px;
+  max-height: 570px;
 `;
 
 const ChessMove: React.FC = () => {
