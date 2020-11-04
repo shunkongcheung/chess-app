@@ -15,7 +15,11 @@ const list = async (connection: Connection, { board }: Query) => {
 
   const [rawData, count] = await connection
     .getRepository(ChessMove)
-    .findAndCount({ fromBoard });
+    .findAndCount({
+      where: { fromBoard },
+      relations: ["fromBoard", "toBoard"],
+      order: { qScore: "DESC" },
+    });
 
   const results = rawData.map(getSerializedChessMove);
   return { count, results };
