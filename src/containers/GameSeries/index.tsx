@@ -25,6 +25,7 @@ interface MoveSequenceItem {
   from: Target;
   to: Target;
   simpleScore: number;
+  qScore: number;
 }
 
 interface GameSeriesProps {
@@ -111,6 +112,7 @@ const GameSeries: React.FC<GameSeriesProps> = ({ moveSequences }) => {
           {moveSequences.map((item, idx) => (
             <MoveListItem
               {...item}
+              extraDesc={`QScore: ${item.qScore.toFixed(2)}`}
               key={`ListItem-${idx}`}
               onClick={() => handleStepChange(idx - step + 1)}
             />
