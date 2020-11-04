@@ -4,8 +4,6 @@ import styled from "styled-components";
 const Container = styled.li`
   border: 1px solid #ccc;
   padding: 20px;
-  display: flex;
-  justify-content: space-evenly;
 `;
 
 interface ListItemProps extends React.HTMLAttributes<HTMLLIElement> {}
