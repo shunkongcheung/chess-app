@@ -181,9 +181,9 @@ const calculateQScores = async (
         .getRepository(ChessMove)
         .createQueryBuilder("chessmove")
         .leftJoinAndSelect("chessmove.fromBoard", "fromBoard")
-        .where(`"fromBoard"."id" IN (:ids)`, {
-          ids: chessBoards.map((itm) => itm.id).join(","),
-        })
+        .where(
+          `"fromBoard"."id" IN (${chessBoards.map((itm) => itm.id).join(",")})`
+        )
         .getMany();
 
       const scores = opponantChessMoves.length
