@@ -9,12 +9,10 @@ import { MoveSequence, GameSeries } from "../../entities";
  *   MoveSequenceItem:
  *     type: object
  *     properties:
- *       board:
- *         type: array
- *         items:
- *           type: array
- *           items:
- *             type: string
+ *       simpleScore:
+ *         type: number
+ *       qScore:
+ *         type: number
  *       side:
  *         type: string
  *         $ref: '#/components/Side'
@@ -27,6 +25,12 @@ import { MoveSequence, GameSeries } from "../../entities";
  *             type: integer
  *           piece:
  *             type: string
+ *           board:
+ *             type: array
+ *             items:
+ *               type: array
+ *               items:
+ *                 type: string
  *       to:
  *         type: object
  *         properties:
@@ -34,6 +38,12 @@ import { MoveSequence, GameSeries } from "../../entities";
  *             type: integer
  *           col:
  *             type: integer
+ *           board:
+ *             type: array
+ *             items:
+ *               type: array
+ *               items:
+ *                 type: string
  *
  *   ListMoveSequence:
  *     type: object
@@ -65,17 +75,20 @@ const list = async (connection: Connection, query: Query) => {
     });
 
   const results = rawData.map(({ chessMove }) => ({
-    board: getBoardFromHash(chessMove.fromBoard.board),
+    simpleScore: chessMove.fromBoard.simpleScore,
+    qScore: chessMove.qScore,
     side: chessMove.side,
     from: {
       row: chessMove.fromRow,
       col: chessMove.fromCol,
       piece: chessMove.fromPiece,
+      board: getBoardFromHash(chessMove.fromBoard.board),
     },
     to: {
       row: chessMove.toRow,
       col: chessMove.toCol,
       piece: chessMove.toPiece,
+      board: getBoardFromHash(chessMove.toBoard.board),
     },
   }));
 
