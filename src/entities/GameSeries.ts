@@ -1,6 +1,6 @@
 import { PrimaryGeneratedColumn, Entity, OneToMany } from "typeorm";
 
-import ChessMove from "./ChessMove";
+import MoveSequence from "./MoveSequence";
 
 /**
  * @swagger
@@ -11,10 +11,10 @@ import ChessMove from "./ChessMove";
  *     properties:
  *       id:
  *         type: number
- *       moves:
+ *       moveSequences:
  *         type: array
  *         items:
- *           $ref: '#/definitions/ChessMove'
+ *           $ref: '#/definitions/MoveSequence'
  */
 
 @Entity()
@@ -22,8 +22,8 @@ class GameSeries {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToMany(() => ChessMove, (moves) => moves.gameSeries)
-  moves: Array<ChessMove>;
+  @OneToMany(() => MoveSequence, (moveSequence) => moveSequence.gameSeries)
+  moveSequences: Array<MoveSequence>;
 }
 
 export default GameSeries;

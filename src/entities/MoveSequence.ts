@@ -25,7 +25,7 @@ class MoveSequence {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => GameSeries, (gameSeries) => gameSeries.moves, {
+  @ManyToOne(() => GameSeries, (gameSeries) => gameSeries.moveSequences, {
     onDelete: "CASCADE",
   })
   gameSeries: GameSeries;
