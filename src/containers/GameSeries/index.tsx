@@ -1,7 +1,6 @@
 import React, { memo } from "react";
 import styled from "styled-components";
 
-import { getMovedBoard } from "../../chess";
 import { Side } from "../../constants";
 import {
   Button,
@@ -18,10 +17,10 @@ interface Target {
   row: number;
   col: number;
   piece: string;
+  board: Board;
 }
 
 interface MoveSequenceItem {
-  board: Board;
   side: Side;
   from: Target;
   to: Target;
@@ -72,13 +71,8 @@ const GameSeries: React.FC<GameSeriesProps> = ({ moveSequences }) => {
   );
 
   const board = React.useMemo(() => {
-    if (step < max) return moveSequences[step].board;
-    const lastSequence = moveSequences[step - 1];
-    return getMovedBoard(
-      lastSequence.board,
-      [lastSequence.from.row, lastSequence.from.col],
-      [lastSequence.to.row, lastSequence.to.col]
-    );
+    if (step < max) return moveSequences[step].from.board;
+    else return moveSequences[step - 1].to.board;
   }, [moveSequences, step, max]);
 
   const selectedChess = React.useMemo<Position | undefined>(
