@@ -2,6 +2,7 @@ import React, { memo } from "react";
 import styled from "styled-components";
 
 import { Side } from "../../constants";
+import { getHashFromBoard } from "../../chess";
 import {
   Button,
   ChessBoard,
@@ -106,6 +107,7 @@ const GameSeries: React.FC<GameSeriesProps> = ({ moveSequences }) => {
             Forward
           </Button>
         </ControlContainer>
+        <pre>{getHashFromBoard(board)}</pre>
       </ChessCol>
       <MoveCol>
         <ListItemGroup>
