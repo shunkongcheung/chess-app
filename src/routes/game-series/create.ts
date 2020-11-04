@@ -1,8 +1,7 @@
-import { Connection, In } from "typeorm";
+import { Connection } from "typeorm";
 
 import {
   getAllNextPositions,
-  getBoardFromHash,
   getBoardWinnerAndScore,
   getHashFromBoard,
   getIsPieceEmpty,
@@ -56,10 +55,12 @@ const create = async (connection: Connection, query: Query) => {
   );
 
   // calculate move qScores
-  await Promise.all([
-    calculateQScores(connection, gameSeries, Side.Bottom),
-    calculateQScores(connection, gameSeries, Side.Top),
-  ]);
+  const moveSequences = await connection.getRepository(MoveSequence).find({
+    relations: ["chessMove", "chessMove.fromBoard", "chessMove.toBoard"],
+    where: { gameSeries },
+    order: { id: "DESC" },
+  });
+  await calculateQScoreHelper(connection, moveSequences);
 
   // return series
   return gameSeries;
@@ -170,70 +171,52 @@ const helper = async (
   );
 };
 
-const calculateQScores = async (
+const calculateQScoreHelper = async (
   connection: Connection,
-  gameSeries: GameSeries,
-  side: Side
+  moveSequences: Array<MoveSequence>
 ) => {
+  const moveSequence = moveSequences.shift();
+  if (!moveSequence) return;
+
   const [ALPHA, GAMMA] = [0.1, 0.8];
+  const { chessMove } = moveSequence;
+  const isUpperSide = chessMove.side === Side.Top;
+  const nextSide = isUpperSide ? Side.Bottom : Side.Top;
 
-  const moveSequences = await connection.getRepository(MoveSequence).find({
-    relations: ["chessMove", "chessMove.fromBoard"],
-    where: { side, gameSeries },
-    order: { id: "DESC" },
-  });
-  const isUpperSide = side === Side.Top;
+  const movedBoard = chessMove.toBoard.board;
 
-  const updatedChessMoves = await Promise.all(
-    moveSequences.map(async (moveSequence) => {
-      const { chessMove } = moveSequence;
+  const chessBoard = await connection
+    .getRepository(ChessBoard)
+    .findOne({ board: movedBoard, side: nextSide });
 
-      const board = getBoardFromHash(chessMove.fromBoard.board);
-      const moves = getAllNextPositions(board, isUpperSide);
-      const boards = moves.map((mv) =>
-        getHashFromBoard(getMovedBoard(board, mv.from, mv.to))
-      );
-
-      const chessBoards = await connection
-        .getRepository(ChessBoard)
-        .find({ board: In(boards) });
-
-      const opponantChessMoves = await connection
-        .getRepository(ChessMove)
-        .createQueryBuilder("chessmove")
-        .leftJoinAndSelect("chessmove.fromBoard", "fromBoard")
-        .where(
-          `"fromBoard"."id" IN (${chessBoards.map((itm) => itm.id).join(",")})`
-        )
-        .getMany();
-
-      const scores = opponantChessMoves.length
-        ? opponantChessMoves.map((chessMove) => chessMove.qScore)
-        : [0];
-
-      const optimalFutureReward = isUpperSide
-        ? Math.max(...scores)
-        : Math.min(...scores);
-
-      if (isUpperSide)
-        console.log({
-          chessMove,
-          boards,
-          scores,
-          opponantChessMoves,
-          optimalFutureReward,
-        });
-
-      const { qScore: oQScore } = chessMove;
-      const reward = chessMove.fromBoard.simpleScore;
-      const addValue = ALPHA * (reward + GAMMA * optimalFutureReward - oQScore);
-      chessMove.qScore += addValue;
-
-      return chessMove;
+  const opponantChessMoves = await connection
+    .getRepository(ChessMove)
+    .createQueryBuilder("chessmove")
+    .leftJoinAndSelect("chessmove.fromBoard", "fromBoard")
+    .where(`"fromBoard"."id" = :id`, {
+      id: chessBoard?.id || -1,
     })
-  );
+    .andWhere(`"chessmove"."side" = :side`, { side: nextSide })
+    .getMany();
 
-  return connection.getRepository(ChessMove).save(updatedChessMoves);
+  const scores = opponantChessMoves.length
+    ? opponantChessMoves.map((chessMove) => chessMove.qScore)
+    : [0];
+
+  // the best score that i get aftr i move the board
+  const optimalFutureReward = isUpperSide
+    ? Math.min(...scores)
+    : Math.max(...scores);
+
+  const { qScore: oQScore } = chessMove;
+  const reward = chessMove.toBoard.simpleScore;
+  const addValue = ALPHA * (reward + GAMMA * optimalFutureReward - oQScore);
+
+  chessMove.qScore += addValue;
+
+  await connection.getRepository(ChessMove).save(chessMove);
+
+  return calculateQScoreHelper(connection, moveSequences);
 };
 
 export default create;
