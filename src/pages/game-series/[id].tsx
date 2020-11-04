@@ -15,7 +15,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   try {
     const moveSequences = await new Promise((resolve, reject) => {
       axios
-        .get(`http://${host}/api/move-sequence?gameSeries=${id}`)
+        .get(`http://${host}/api/chess-moves?gameSeries=${id}`)
         .then(({ data }) => resolve(data.results))
         .catch(reject);
     });
