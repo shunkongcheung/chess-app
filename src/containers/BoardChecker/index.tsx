@@ -1,6 +1,8 @@
 import React, { memo } from "react";
+import { useRouter } from "next/router";
 import styled from "styled-components";
 
+import { Side } from "../../constants";
 import {
   Button,
   ChessBoard,
@@ -12,9 +14,10 @@ import {
   getHashFromBoard,
   getMovedBoard,
   getPieceNextPositions,
-  getInitialBoard,
   getIsPieceEmpty,
 } from "../../chess";
+
+type Board = Array<Array<string>>;
 
 type Position = [number, number];
 
@@ -22,6 +25,26 @@ interface Step {
   from: Position;
   to: Position;
   target: string;
+}
+
+interface Target {
+  row: number;
+  col: number;
+  piece: string;
+  board: Board;
+}
+
+interface ChessMoveItem {
+  side: Side;
+  from: Target;
+  to: Target;
+  simpleScore: number;
+  qScore: number;
+}
+
+interface BoardCheckerProps {
+  initialBoard: Board;
+  chessMoves: Array<ChessMoveItem>;
 }
 
 const Container = styled.div`
@@ -47,10 +70,15 @@ const MoveCol = styled.div`
   max-height: 570px;
 `;
 
-const ChessMove: React.FC = () => {
-  const [board, setBoard] = React.useState(getInitialBoard());
+const BoardChecker: React.FC<BoardCheckerProps> = ({
+  initialBoard,
+  chessMoves,
+}) => {
+  const [board, setBoard] = React.useState(initialBoard);
   const [selectedChess, setSelectedChess] = React.useState<Position>([-1, -1]);
   const [steps, setSteps] = React.useState<Array<Step>>([]);
+
+  const router = useRouter();
 
   const isSelected =
     selectedChess[0] !== -1 &&
@@ -115,6 +143,10 @@ const ChessMove: React.FC = () => {
     setSteps([...steps]);
   }, [board, steps]);
 
+  React.useEffect(() => {
+    setBoard(initialBoard);
+  }, [initialBoard]);
+
   return (
     <Container>
       <ChessCol>
@@ -131,30 +163,43 @@ const ChessMove: React.FC = () => {
             Remove
           </Button>
         </ControlContainer>
-        <pre>{getHashFromBoard(board)}</pre>
       </ChessCol>
       <MoveCol>
         <ListItemGroup>
-          {positions.map((position, idx) => (
-            <MoveListItem
-              key={`ListItem-${idx}`}
-              onClick={() => handleMoveSelect(idx)}
-              to={{
-                row: position[0],
-                col: position[1],
-                piece: board[position[0]][position[1]],
-              }}
-              from={{
-                row: selectedChess[0],
-                col: selectedChess[1],
-                piece: board[selectedChess[0]][selectedChess[1]],
-              }}
-            />
-          ))}
+          {!!positions.length
+            ? positions.map((position, idx) => (
+                <MoveListItem
+                  key={`ListItem-${idx}`}
+                  onClick={() => handleMoveSelect(idx)}
+                  to={{
+                    row: position[0],
+                    col: position[1],
+                    piece: board[position[0]][position[1]],
+                  }}
+                  from={{
+                    row: selectedChess[0],
+                    col: selectedChess[1],
+                    piece: board[selectedChess[0]][selectedChess[1]],
+                  }}
+                />
+              ))
+            : chessMoves.map((chessMove, idx) => (
+                <MoveListItem
+                  key={`ChessMoveListItem-${idx}`}
+                  extraDesc={`QScore: ${chessMove.qScore.toFixed(2)}`}
+                  onClick={() =>
+                    router.push(
+                      `/board-checker/${getHashFromBoard(chessMove.to.board)}`
+                    )
+                  }
+                  to={chessMove.to}
+                  from={chessMove.from}
+                />
+              ))}
         </ListItemGroup>
       </MoveCol>
     </Container>
   );
 };
 
-export default memo(ChessMove);
+export default memo(BoardChecker);
