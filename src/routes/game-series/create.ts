@@ -25,10 +25,11 @@ type Board = Array<Array<string>>;
 interface Query {
   board: Board;
   round: number;
+  randomRate: number;
 }
 
 const create = async (connection: Connection, query: Query) => {
-  let { round, board } = query;
+  let { randomRate, round, board } = query;
 
   const gameSeries = await connection.transaction(async (entityManager) => {
     await entityManager.getRepository(GameSeries).save({});
@@ -44,7 +45,15 @@ const create = async (connection: Connection, query: Query) => {
   const prevMove = undefined;
 
   // create boards and moves
-  await helper(connection, board, gameSeries, round, prevMove, side);
+  await helper(
+    connection,
+    board,
+    gameSeries,
+    round,
+    prevMove,
+    randomRate,
+    side
+  );
 
   // calculate move qScores
   await Promise.all([
@@ -62,6 +71,7 @@ const helper = async (
   gameSeries: GameSeries,
   round: number,
   prevMove: ChessMove | undefined,
+  randomRate: number,
   side: Side
 ) => {
   // get current situation
@@ -125,7 +135,10 @@ const helper = async (
 
   // get all possible position
   const moves = getAllNextPositions(board, side === Side.Top);
-  const selectedPos = await choose(connection, { moves, side, board });
+  const selectedPos =
+    Math.random() < randomRate
+      ? moves[Math.floor(moves.length * Math.random())]
+      : await choose(connection, { moves, side, board });
 
   // storing moves
   const chessMove = new ChessMove();
@@ -146,7 +159,15 @@ const helper = async (
   side = side === Side.Top ? Side.Bottom : Side.Top;
   round--;
 
-  await helper(connection, board, gameSeries, round, chessMove, side);
+  await helper(
+    connection,
+    board,
+    gameSeries,
+    round,
+    chessMove,
+    randomRate,
+    side
+  );
 };
 
 const calculateQScores = async (

@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import * as yup from "yup";
+
 import { create, list } from "../../routes/game-series";
 import { getInitialBoard } from "../../chess";
 import { getDbConnection } from "../../utils";
-
-import * as yup from "yup";
 
 /**
  * @swagger
@@ -42,6 +42,11 @@ import * as yup from "yup";
  *         schema:
  *           type: object
  *           properties:
+ *             randomRate:
+ *               in: body
+ *               required: false
+ *               type: number
+ *               default: 0.5
  *             board:
  *               in: body
  *               required: false
@@ -78,6 +83,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(200).json(resData);
   } else if (method === "POST") {
     const schema = yup.object({
+      randomRate: yup.number().max(1).min(0).optional().default(0.5),
+      shdTrain: yup.boolean().optional().default(true),
       board: yup
         .array()
         .of(yup.array().of(yup.string().required()).required())
