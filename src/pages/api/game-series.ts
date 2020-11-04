@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import * as yup from "yup";
 
 import { create, list } from "../../routes/game-series";
-import { getInitialBoard } from "../../chess";
+import { getBoardFromHash, getInitialBoard } from "../../chess";
 import { getDbConnection } from "../../utils";
 
 /**
@@ -37,30 +37,21 @@ import { getDbConnection } from "../../utils";
  *     produces:
  *       - application/json
  *     parameters:
- *       - name: data
- *         in: body
- *         schema:
- *           type: object
- *           properties:
- *             randomRate:
- *               in: body
- *               required: false
- *               type: number
- *               default: 0.5
- *             board:
- *               in: body
- *               required: false
- *               type: array
- *               items:
- *                 type: array
- *                 items:
- *                   type: string
- *               description: 2D matrix of string. If not provided, initial board will be used.
- *             round:
- *               in: formData
- *               required: false
- *               type: number
- *               default: 10
+ *       - name: randomRate
+ *         in: formData
+ *         required: false
+ *         type: number
+ *         default: 0.5
+ *       - name: board
+ *         in: formData
+ *         required: false
+ *         type: string
+ *         description: 2D matrix of string. If not provided, initial board will be used.
+ *       - name: round
+ *         in: formData
+ *         required: false
+ *         type: number
+ *         default: 10
  *     responses:
  *       201:
  *         schema:
@@ -85,15 +76,12 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const schema = yup.object({
       randomRate: yup.number().max(1).min(0).optional().default(0.5),
       shdTrain: yup.boolean().optional().default(true),
-      board: yup
-        .array()
-        .of(yup.array().of(yup.string().required()).required())
-        .optional()
-        .default(getInitialBoard()),
+      board: yup.string().optional(),
       round: yup.number().min(1).optional().default(10),
     });
-    const validated = await schema.validate(req.body);
-    const resData = await create(conn, validated);
+    const { board, ...validated } = await schema.validate(req.body);
+    const boardUnhash = board ? getBoardFromHash(board) : getInitialBoard();
+    const resData = await create(conn, { ...validated, board: boardUnhash });
     res.status(201).json(resData);
   } else {
     return res.status(404).json({ message: "Method not found." });
