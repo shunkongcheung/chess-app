@@ -22,6 +22,7 @@ interface Target {
 }
 
 interface MoveListItemProps {
+  extraDesc?: string;
   from: Target;
   to: Target;
   onClick?: () => any;
@@ -44,7 +45,17 @@ const ChessContainer = styled.div`
   width: 50px;
 `;
 
-const MoveListItem: React.FC<MoveListItemProps> = ({ from, to, onClick }) => {
+const DescContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const MoveListItem: React.FC<MoveListItemProps> = ({
+  extraDesc,
+  from,
+  to,
+  onClick,
+}) => {
   const [ArrowIcon, desc] = React.useMemo(() => {
     const [right, down] = [to.col - from.col, to.row - from.row];
     const isUp = from.row > to.row;
@@ -73,7 +84,10 @@ const MoveListItem: React.FC<MoveListItemProps> = ({ from, to, onClick }) => {
         <ChessPiece pieceCode={from.piece} isSelected={false} />
       </ChessContainer>
       <ArrowIcon style={{ fontSize: 40 }} />
-      <div>{desc}</div>
+      <DescContainer>
+        <div>{desc}</div>
+        <div>{extraDesc}</div>
+      </DescContainer>
       <ChessContainer>
         <ChessPiece pieceCode={to.piece} isSelected={false} />
       </ChessContainer>
