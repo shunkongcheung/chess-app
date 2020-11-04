@@ -1,19 +1,24 @@
-import { Connection } from "typeorm";
+import { Connection, In } from "typeorm";
 
 import {
   getAllNextPositions,
+  getBoardFromHash,
   getBoardWinnerAndScore,
   getHashFromBoard,
   getIsPieceEmpty,
   getMovedBoard,
 } from "../../chess";
+
 import { Side } from "../../constants";
+
 import {
   ChessBoard,
   ChessMove,
   GameSeries,
   MoveSequence,
 } from "../../entities";
+
+import { choose } from "../chess-ml";
 
 type Board = Array<Array<string>>;
 
@@ -42,10 +47,10 @@ const create = async (connection: Connection, query: Query) => {
   await helper(connection, board, gameSeries, round, prevMove, side);
 
   // calculate move qScores
-  // await Promise.all([
-  //   calculateQScores(connection, gameSeries, Side.Bottom),
-  //   calculateQScores(connection, gameSeries, Side.Top),
-  // ]);
+  await Promise.all([
+    calculateQScores(connection, gameSeries, Side.Bottom),
+    calculateQScores(connection, gameSeries, Side.Top),
+  ]);
 
   // return series
   return gameSeries;
@@ -119,14 +124,8 @@ const helper = async (
   if (!getIsPieceEmpty(winner) || round <= 0) return;
 
   // get all possible position
-  const positions = getAllNextPositions(board, side === Side.Top);
-
-  // randomly choose a board to move
-  // TODO:
-  // choose from trained model
-  // const posIdx = Math.floor(Math.random() * positions.length);
-  const posIdx = 0;
-  const selectedPos = positions[posIdx];
+  const moves = getAllNextPositions(board, side === Side.Top);
+  const selectedPos = await choose(connection, { moves, side, board });
 
   // storing moves
   const chessMove = new ChessMove();
@@ -150,8 +149,70 @@ const helper = async (
   await helper(connection, board, gameSeries, round, chessMove, side);
 };
 
-// const calculateQScores = (connection:Connection, gameSeries:GameSeries, side:Side) => {
+const calculateQScores = async (
+  connection: Connection,
+  gameSeries: GameSeries,
+  side: Side
+) => {
+  const [ALPHA, GAMMA] = [0.1, 0.8];
 
-// }
+  const moveSequences = await connection.getRepository(MoveSequence).find({
+    relations: ["chessMove", "chessMove.fromBoard"],
+    where: { side, gameSeries },
+    order: { id: "DESC" },
+  });
+  const isUpperSide = side === Side.Top;
+
+  const updatedChessMoves = await Promise.all(
+    moveSequences.map(async (moveSequence) => {
+      const { chessMove } = moveSequence;
+
+      const board = getBoardFromHash(chessMove.fromBoard.board);
+      const moves = getAllNextPositions(board, isUpperSide);
+      const boards = moves.map((mv) =>
+        getHashFromBoard(getMovedBoard(board, mv.from, mv.to))
+      );
+
+      const chessBoards = await connection
+        .getRepository(ChessBoard)
+        .find({ board: In(boards) });
+
+      const opponantChessMoves = await connection
+        .getRepository(ChessMove)
+        .createQueryBuilder("chessmove")
+        .leftJoinAndSelect("chessmove.fromBoard", "fromBoard")
+        .where(`"fromBoard"."id" IN (:ids)`, {
+          ids: chessBoards.map((itm) => itm.id).join(","),
+        })
+        .getMany();
+
+      const scores = opponantChessMoves.length
+        ? opponantChessMoves.map((chessMove) => chessMove.qScore)
+        : [0];
+
+      const optimalFutureReward = isUpperSide
+        ? Math.max(...scores)
+        : Math.min(...scores);
+
+      if (isUpperSide)
+        console.log({
+          chessMove,
+          boards,
+          scores,
+          opponantChessMoves,
+          optimalFutureReward,
+        });
+
+      const { qScore: oQScore } = chessMove;
+      const reward = chessMove.fromBoard.simpleScore;
+      const addValue = ALPHA * (reward + GAMMA * optimalFutureReward - oQScore);
+      chessMove.qScore += addValue;
+
+      return chessMove;
+    })
+  );
+
+  return connection.getRepository(ChessMove).save(updatedChessMoves);
+};
 
 export default create;
