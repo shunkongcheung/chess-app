@@ -4,6 +4,7 @@ import getBoardWinnerAndScore from "./getBoardWinnerAndScore";
 import getHashFromBoard from "./getHashFromBoard";
 import getInitialBoard from "./getInitialBoard";
 import getMovedBoard from "./getMovedBoard";
+import getOneHotBoard from "./getOneHotBoard";
 import getPieceNextPositions from "./getPieceNextPositions";
 import getIsPieceEmpty from "./getIsPieceEmpty";
 
@@ -14,6 +15,7 @@ export {
   getHashFromBoard,
   getIsPieceEmpty,
   getInitialBoard,
+  getOneHotBoard,
   getMovedBoard,
   getPieceNextPositions,
 };
