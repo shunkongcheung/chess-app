@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import * as yup from "yup";
 
+import { Side } from "../../constants";
 import { create, list } from "../../routes/game-series";
 import { getBoardFromHash, getInitialBoard } from "../../chess";
 import { getDbConnection } from "../../utils";
@@ -81,7 +82,13 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     });
     const { board, ...validated } = await schema.validate(req.body);
     const boardUnhash = board ? getBoardFromHash(board) : getInitialBoard();
-    const resData = await create(conn, { ...validated, board: boardUnhash });
+    const side = Side.Bottom;
+    const resData = await create(conn, {
+      ...validated,
+      side,
+      board: boardUnhash,
+      shdUpdateQScores: false,
+    });
     res.status(201).json(resData);
   } else {
     return res.status(404).json({ message: "Method not found." });

@@ -22,7 +22,9 @@ import { choose } from "../chess-ml";
 type Board = Array<Array<string>>;
 
 interface Query {
+  side: Side;
   board: Board;
+  shdUpdateQScores: boolean;
   round: number;
   randomRate: number;
 }
@@ -40,7 +42,6 @@ const create = async (connection: Connection, query: Query) => {
       .getRawOne();
   });
 
-  const side = Side.Bottom as Side;
   const prevMove = undefined;
 
   // create boards and moves
@@ -51,8 +52,10 @@ const create = async (connection: Connection, query: Query) => {
     round,
     prevMove,
     randomRate,
-    side
+    query.side
   );
+
+  if (!query.shdUpdateQScores) return gameSeries;
 
   // calculate move qScores
   const moveSequences = await connection.getRepository(MoveSequence).find({
@@ -204,15 +207,16 @@ const calculateQScoreHelper = async (
     : [0];
 
   // the best score that i get aftr i move the board
-  const optimalFutureReward = isUpperSide
-    ? Math.min(...scores)
-    : Math.max(...scores);
+  const optimalFutureReward = -Math.max(...scores);
 
-  const { qScore: oQScore } = chessMove;
-  const reward = chessMove.toBoard.simpleScore;
-  const addValue = ALPHA * (reward + GAMMA * optimalFutureReward - oQScore);
+  // populate qscores
+  // const { qScore: oQScore } = chessMove;
+  let reward = chessMove.toBoard.simpleScore;
+  if (!isUpperSide) reward = -reward;
 
-  chessMove.qScore += addValue;
+  chessMove.qScore = opponantChessMoves.length ? optimalFutureReward : reward;
+  // const addValue = ALPHA * (reward + GAMMA * optimalFutureReward - oQScore);
+  // chessMove.qScore += addValue;
 
   await connection.getRepository(ChessMove).save(chessMove);
 
