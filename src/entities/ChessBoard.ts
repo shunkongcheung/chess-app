@@ -1,5 +1,4 @@
 import { Column, PrimaryGeneratedColumn, Entity, Index } from "typeorm";
-import { Side } from "../constants";
 
 /**
  * @swagger
@@ -12,8 +11,6 @@ import { Side } from "../constants";
  *         type: number
  *       board:
  *         type: string
- *       side:
- *         $ref: '#/components/Side'
  *       simpleScore:
  *         type: number
  */
@@ -26,9 +23,6 @@ class ChessBoard {
   @Column({ unique: true })
   @Index()
   board: string;
-
-  @Column({ type: "enum", enum: Object.values(Side) })
-  side: Side;
 
   @Column({ type: "integer" })
   simpleScore: number;
