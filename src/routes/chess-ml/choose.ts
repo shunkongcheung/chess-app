@@ -93,7 +93,7 @@ const choose = async (connection: Connection, query: Query): Promise<Move> => {
   const { side, board, moves } = query;
   const hashBoard = getHashFromBoard(board);
   const chessBoard = await connection.getRepository(ChessBoard).findOne({
-    where: { board: hashBoard, side },
+    where: { board: hashBoard },
   });
 
   const chessMoves = await getChessBoard(connection, chessBoard, side);

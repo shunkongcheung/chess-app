@@ -89,7 +89,6 @@ const helper = async (
     .into(ChessBoard)
     .values({
       board: boardHash,
-      side: side,
       simpleScore: score,
     })
     .onConflict(`("board") DO NOTHING`)
@@ -190,7 +189,7 @@ const calculateQScoreHelper = async (
 
   const chessBoard = await connection
     .getRepository(ChessBoard)
-    .findOne({ board: movedBoard, side: nextSide });
+    .findOne({ board: movedBoard });
 
   const opponantChessMoves = await connection
     .getRepository(ChessMove)
