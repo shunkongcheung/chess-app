@@ -110,7 +110,10 @@ const choose = async (connection: Connection, query: Query): Promise<Move> => {
     const compareArr = moves.map((move) => {
       const exist = chessMoves.find(
         (chessMove) =>
-          chessMove.toRow === move.to[0] && chessMove.toCol === move.to[1]
+          chessMove.fromRow === move.from[0] &&
+          chessMove.fromCol === move.from[1] &&
+          chessMove.toRow === move.to[0] &&
+          chessMove.toCol === move.to[1]
       );
       const score = exist ? exist.qScore : getScore(board, move, side);
       return { score, move };
