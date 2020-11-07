@@ -209,11 +209,16 @@ const calculateQScoreHelper = async (
   const optimalFutureReward = -Math.max(...scores);
 
   // populate qscores
-  // const { qScore: oQScore } = chessMove;
+  const { qScore: oQScore } = chessMove;
   let reward = chessMove.toBoard.simpleScore;
   if (!isUpperSide) reward = -reward;
 
-  chessMove.qScore = opponantChessMoves.length ? optimalFutureReward : reward;
+  const predictValue = opponantChessMoves.length ? optimalFutureReward : reward;
+
+  // adding predict value to existing value, if existing value is not zero, this
+  // will accumulate as this spot is being visited more and more
+  chessMove.qScore = predictValue + 0.01 * oQScore;
+
   // const addValue = ALPHA * (reward + GAMMA * optimalFutureReward - oQScore);
   // chessMove.qScore += addValue;
 
