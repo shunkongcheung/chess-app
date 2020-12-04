@@ -1,4 +1,4 @@
-import { PrimaryGeneratedColumn, Entity, OneToMany } from "typeorm";
+import {Column, PrimaryGeneratedColumn, Entity, OneToMany } from "typeorm";
 
 import MoveSequence from "./MoveSequence";
 
@@ -21,6 +21,12 @@ import MoveSequence from "./MoveSequence";
 class GameSeries {
   @PrimaryGeneratedColumn()
   id: number;
+
+	@Column({default: true})
+	botPlayerIsComp:boolean;
+
+	@Column({default: true})
+	topPlayerIsComp:boolean;
 
   @OneToMany(() => MoveSequence, (moveSequence) => moveSequence.gameSeries)
   moveSequences: Array<MoveSequence>;
