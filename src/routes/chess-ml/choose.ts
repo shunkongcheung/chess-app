@@ -1,8 +1,5 @@
 import { Connection } from "typeorm";
-// import brain from "brain.js";
 
-// import { getOneHotBoard } from "../../chess";
-// import { ChessMlModel } from "../../entities";
 import {
   getMovedBoard,
   getHashFromBoard,
