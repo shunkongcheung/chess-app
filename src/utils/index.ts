@@ -1,3 +1,4 @@
+import calculateQScore from "./calculateQScore";
 import getDbConnection from "./getDbConnection";
 
-export { getDbConnection };
+export { calculateQScore, getDbConnection };
