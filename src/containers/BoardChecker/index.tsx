@@ -17,6 +17,8 @@ import {
   getIsPieceEmpty,
 } from "../../chess";
 
+import { useMoveSteps } from "../../hooks";
+
 type Board = Array<Array<string>>;
 
 type Position = [number, number];
@@ -75,73 +77,19 @@ const BoardChecker: React.FC<BoardCheckerProps> = ({
   chessMoves,
 }) => {
   const [board, setBoard] = React.useState(initialBoard);
-  const [selectedChess, setSelectedChess] = React.useState<Position>([-1, -1]);
-  const [steps, setSteps] = React.useState<Array<Step>>([]);
 
   const router = useRouter();
 
-  const isSelected =
-    selectedChess[0] !== -1 &&
-    !getIsPieceEmpty(board[selectedChess[0]][selectedChess[1]]);
-
-  const positions = isSelected
-    ? getPieceNextPositions(board, selectedChess)
-    : [];
-
-  const handleMoveSelect = React.useCallback(
-    (idx: number) => {
-      const target = board[positions[idx][0]][positions[idx][1]];
-      const step = { from: selectedChess, to: positions[idx], target };
-      setSteps((o) => [...o, step]);
-      setBoard((o) => getMovedBoard(o, selectedChess, positions[idx]));
-      setSelectedChess([-1, -1]);
-    },
-    [selectedChess]
-  );
-
-  const handleSelect = React.useCallback(
-    (newPosition: Position) => {
-      setSelectedChess((o) => {
-        if (o[0] === newPosition[0] && o[1] === newPosition[1]) return [-1, -1];
-
-        for (let idx = 0; idx < positions.length; idx++) {
-          const curPosition = positions[idx];
-          if (
-            curPosition[0] === newPosition[0] &&
-            curPosition[1] === newPosition[1]
-          ) {
-            handleMoveSelect(idx);
-            return [-1, -1];
-          }
-        }
-
-        return newPosition;
-      });
-    },
-    [handleMoveSelect, positions]
-  );
-
-  const handleRemove = React.useCallback(() => {
-    if (!isSelected) return;
-    const target = board[selectedChess[0]][selectedChess[1]];
-    const step = { from: selectedChess, to: selectedChess, target };
-    setSteps((o) => [...o, step]);
-    setBoard((o) => getMovedBoard(o, selectedChess, selectedChess));
-    setSelectedChess([-1, -1]);
-  }, [isSelected]);
-
-  const handleRevert = React.useCallback(() => {
-    const lastStep = steps.pop();
-    if (!!lastStep) {
-      const newBoard = JSON.parse(JSON.stringify(board));
-      const { from, to, target } = lastStep;
-      newBoard[from[0]][from[1]] = newBoard[to[0]][to[1]];
-      newBoard[to[0]][to[1]] = target;
-      setBoard(newBoard);
-    }
-
-    setSteps([...steps]);
-  }, [board, steps]);
+  const {
+    handleMoveSelect,
+    handleRemove,
+    handleRevert,
+    handleSelect,
+    isSelected,
+    positions,
+    selectedChess,
+    steps,
+  } = useMoveSteps(board, setBoard);
 
   React.useEffect(() => {
     setBoard(initialBoard);
