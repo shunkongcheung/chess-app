@@ -10,24 +10,13 @@ import {
   MoveListItem,
 } from "../../components";
 
-import {
-  getHashFromBoard,
-  getMovedBoard,
-  getPieceNextPositions,
-  getIsPieceEmpty,
-} from "../../chess";
+import { getHashFromBoard, getMovedBoard } from "../../chess";
 
 import { useMoveSteps } from "../../hooks";
 
 type Board = Array<Array<string>>;
 
 type Position = [number, number];
-
-interface Step {
-  from: Position;
-  to: Position;
-  target: string;
-}
 
 interface Target {
   row: number;
@@ -76,11 +65,10 @@ const BoardChecker: React.FC<BoardCheckerProps> = ({
   initialBoard,
   chessMoves,
 }) => {
-  const [board, setBoard] = React.useState(initialBoard);
-
   const router = useRouter();
 
   const {
+    board,
     handleMoveSelect,
     handleRemove,
     handleRevert,
@@ -89,11 +77,7 @@ const BoardChecker: React.FC<BoardCheckerProps> = ({
     positions,
     selectedChess,
     steps,
-  } = useMoveSteps(board, setBoard);
-
-  React.useEffect(() => {
-    setBoard(initialBoard);
-  }, [initialBoard]);
+  } = useMoveSteps(initialBoard);
 
   return (
     <Container>
@@ -104,7 +88,7 @@ const BoardChecker: React.FC<BoardCheckerProps> = ({
           selectedChess={selectedChess}
         />
         <ControlContainer>
-          <Button disabled={!steps.length} onClick={handleRevert}>
+          <Button disabled={!steps.length} onClick={() => handleRevert()}>
             Revert
           </Button>
           <Button disabled={!isSelected} onClick={handleRemove}>
