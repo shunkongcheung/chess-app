@@ -1,15 +1,6 @@
 import React from "react";
-import { useRouter } from "next/router";
-import { getInitialBoard, getHashFromBoard } from "../chess";
+import Playground from "../containers/Playground";
 
 export default function Home() {
-  const router = useRouter();
-
-  React.useEffect(() => {
-    const board = getInitialBoard();
-    const hash = getHashFromBoard(board);
-    router.push(`/board-checker/${hash}`);
-  }, []);
-
-  return <></>;
+  return <Playground />;
 }
