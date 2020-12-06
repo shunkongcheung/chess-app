@@ -2,6 +2,7 @@ import React, { memo } from "react";
 import styled from "styled-components";
 
 import { Button } from "../../components";
+import { Side } from "../../constants";
 
 const ChooseBtn = styled(Button)`
   width: 150px;
@@ -13,20 +14,15 @@ const Container = styled.div`
   flex-direction: column;
 `;
 
-enum PlayerSide {
-  TOP = "top",
-  BOTTOM = "bottom",
-}
-
 interface SelectSidePanelProps {
-  startGame: (side: PlayerSide) => any;
+  startGame: (side: Side) => any;
 }
 
 const SelectSidePanel: React.FC<SelectSidePanelProps> = ({ startGame }) => {
   return (
     <Container>
-      <ChooseBtn onClick={() => startGame("top")}>紅棋（後走）</ChooseBtn>
-      <ChooseBtn onClick={() => startGame("bottom")}>黑棋（後走）</ChooseBtn>
+      <ChooseBtn onClick={() => startGame(Side.Top)}>紅棋（後走）</ChooseBtn>
+      <ChooseBtn onClick={() => startGame(Side.Bottom)}>黑棋（後走）</ChooseBtn>
     </Container>
   );
 };
