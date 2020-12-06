@@ -2,10 +2,10 @@ import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 
 import { getBoardWinnerAndScore, getIsPieceEmpty } from "../../chess";
-
+import { Side } from "../../constants";
 import { useMoveSteps } from "../../hooks";
 
-type Board = Array<Array<string>>;
+import useImprove from "./useImprove";
 
 enum GameStage {
   START = "start",
@@ -13,35 +13,37 @@ enum GameStage {
   ENDED = "ended",
 }
 
-enum PlayerSide {
-  TOP = "top",
-  BOTTOM = "bottom",
-}
-
 interface GameStateShape {
   gameStage: GameStage;
-  userSide: PlayerSide;
-  compSide: PlayerSide;
-  turnSide: PlayerSide;
+  userSide: Side;
+  compSide: Side;
+  turnSide: Side;
 }
 
 function useGameState() {
   const [gameState, setGameState] = useState<GameStateShape>({
     gameStage: GameStage.START,
-    userSide: PlayerSide.BOTTOM,
-    compSide: PlayerSide.TOP,
-    turnSide: PlayerSide.BOTTOM,
+    userSide: Side.Bottom,
+    compSide: Side.Top,
+    turnSide: Side.Bottom,
   });
 
-  const { board, handleRevert, handleSelect, selectedChess } = useMoveSteps();
+  const {
+    board,
+    handleRevert,
+    handleSelect,
+    selectedChess,
+    steps,
+  } = useMoveSteps();
 
-  const startGame = useCallback((userSide: PlayerSide) => {
+  useImprove(gameState.compSide, gameState.gameStage, steps);
+
+  const startGame = useCallback((userSide: Side) => {
     setGameState({
       gameStage: GameStage.PLAYING,
       userSide,
-      compSide:
-        userSide === PlayerSide.TOP ? PlayerSide.BOTTOM : PlayerSide.TOP,
-      turnSide: PlayerSide.BOTTOM,
+      compSide: userSide === Side.Top ? Side.Bottom : Side.Top,
+      turnSide: Side.Bottom,
     });
   }, []);
 
@@ -70,6 +72,7 @@ function useGameState() {
   }, [board, gameState.turnSide, gameState.compSide, gameState.gameStage]);
 
   useEffect(() => {
+    // update game status
     setGameState((o) => {
       if (o.gameStage !== GameStage.PLAYING) return o;
 
@@ -84,7 +87,8 @@ function useGameState() {
     });
   }, [board]);
 
-  const isUserTopSide = gameState.userSide === PlayerSide.TOP;
+  // returning
+  const isUserTopSide = gameState.userSide === Side.Top;
 
   const handleSelectWithTurnUpdate = useCallback(
     async (pos: any) => {
