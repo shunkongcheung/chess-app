@@ -44,7 +44,7 @@ const improve = async (connection: Connection, query: Query) => {
     .insert()
     .into(ChessBoard)
     .values(chessBoardValues)
-    .onConflict(`("board") DO NOTHING`)
+    .onConflict(`DO NOTHING`)
     .execute();
 
   const chessBoardRepo = connection.getRepository(ChessBoard);
@@ -61,9 +61,7 @@ const improve = async (connection: Connection, query: Query) => {
     .insert()
     .into(ChessMove)
     .values(chessMoveValues)
-    .onConflict(
-      `("fromBoardId", "fromRow", "fromCol", "toRow", "toCol") DO NOTHING`
-    )
+    .onConflict(`DO NOTHING`)
     .execute();
 
   const chessMoveRepo = connection.getRepository(ChessMove);
