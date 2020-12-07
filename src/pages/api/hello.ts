@@ -61,7 +61,7 @@ const getBoard = async (conn: Connection, boardHash?: string) => {
 
   const count = await chessBoardRepo.count();
   const skip = Math.floor(Math.random() * count);
-  const chessBoard = await chessBoardRepo.find({ skip, take: 1 })[0];
+  const chessBoard = (await chessBoardRepo.find({ skip, take: 1 }))[0];
   return getBoardFromHash(chessBoard.board);
 };
 
