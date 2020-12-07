@@ -33,14 +33,12 @@ import { getDbConnection } from "../../utils";
  *         required: true
  *         default: 50
  *         min: 1
- *         max: 100
  *       - name: round
  *         type: number
  *         in: formData
  *         required: true
  *         default: 20
  *         min: 1
- *         max: 50
  *         description: repeat from this start board for # of times
  *       - name: board
  *         type: string
@@ -72,8 +70,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (method === "POST") {
     const schema = yup.object({
       side: yup.string().oneOf(Object.values(Side)).required(),
-      steps: yup.number().min(1).max(100).required(),
-      round: yup.number().min(1).max(50).required(),
+      steps: yup.number().min(1).required(),
+      round: yup.number().min(1).required(),
       board: yup.string().optional(),
     });
     const query = await schema.validate(req.body);
