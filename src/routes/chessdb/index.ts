@@ -16,7 +16,6 @@ type Board = Array<Array<string>>;
 interface Query {
   side: Side;
   board: Board;
-  round: number;
   steps: number;
 }
 
@@ -78,17 +77,15 @@ const getMoves = async (board: Board, side: Side, counter: number) => {
 };
 
 const chessdb = async (connection: Connection, query: Query) => {
-  const { board, side, round, steps } = query;
+  const { board, side, steps } = query;
 
-  for (let idx = 0; idx < round; idx++) {
-    const moves = await getMoves(board, side, steps);
-    await improve(connection, {
-      startBoard: board,
-      botPlayerIsComp: false,
-      topPlayerIsComp: false,
-      moves,
-    });
-  }
+  const moves = await getMoves(board, side, steps);
+  await improve(connection, {
+    startBoard: board,
+    botPlayerIsComp: false,
+    topPlayerIsComp: false,
+    moves,
+  });
 };
 
 export default chessdb;

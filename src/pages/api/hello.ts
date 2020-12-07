@@ -94,10 +94,14 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       board: yup.string().optional(),
     });
     const query = await schema.validate(req.body);
-    const { board: boardHash } = query;
-    const board = await getBoard(conn, query.side, boardHash);
-    await chessdb(conn, { ...query, board });
-    return res.status(200).json({ ...query, board });
+    const { round, board: boardHash } = query;
+    await Promise.all(
+      Array.from({ length: round }).map(async () => {
+        const board = await getBoard(conn, query.side, boardHash);
+        await chessdb(conn, { ...query, board });
+      })
+    );
+    return res.status(200).json(query);
   } else {
     return res.status(404).json({ message: "Method not found." });
   }
