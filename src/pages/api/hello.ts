@@ -1,10 +1,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { Connection } from "typeorm";
+import { MoreThan, LessThan, Connection } from "typeorm";
 import * as yup from "yup";
 
 import { getBoardFromHash } from "../../chess";
 import { Side } from "../../constants";
-import { ChessBoard } from "../../entities";
+import { ChessMove } from "../../entities";
 import chessdb from "../../routes/chessdb";
 import { getDbConnection } from "../../utils";
 
@@ -53,14 +53,33 @@ import { getDbConnection } from "../../utils";
  *
  */
 
-const getBoard = async (conn: Connection, boardHash?: string) => {
+const getBoard = async (conn: Connection, side: Side, boardHash?: string) => {
   if (boardHash) return getBoardFromHash(boardHash);
-  const chessBoardRepo = conn.getRepository(ChessBoard);
 
-  const count = await chessBoardRepo.count();
-  const skip = Math.floor(Math.random() * count);
-  const chessBoard = (await chessBoardRepo.find({ skip, take: 1 }))[0];
-  return getBoardFromHash(chessBoard.board);
+  const chessMoveRepo = conn.getRepository(ChessMove);
+  const chessMoves = await chessMoveRepo.find({
+    relations: ["fromBoard"],
+    where: [
+      { qScore: MoreThan(100), side },
+      { qScore: LessThan(-100), side },
+    ],
+    take: 100,
+  });
+  if (chessMoves.length) {
+    // try updating move that are higher than 100
+    // should have a lot of them in production database
+    const index = Math.floor(Math.random() * chessMoves.length);
+    const chessMove = chessMoves[index];
+    return getBoardFromHash(chessMove.fromBoard.board);
+  } else {
+    // if none exist
+    const chessMoves = await chessMoveRepo.find({
+      relations: ["fromBoard"],
+      where: { side },
+    });
+    const index = Math.floor(Math.random() * chessMoves.length);
+    return getBoardFromHash(chessMoves[index].fromBoard.board);
+  }
 };
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -76,7 +95,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     });
     const query = await schema.validate(req.body);
     const { board: boardHash } = query;
-    const board = await getBoard(conn, boardHash);
+    const board = await getBoard(conn, query.side, boardHash);
     await chessdb(conn, { ...query, board });
     return res.status(200).json({ ...query, board });
   } else {
