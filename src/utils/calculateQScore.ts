@@ -34,7 +34,7 @@ const calculateQScore = async (
     ? opponantChessMoves.map((chessMove) => chessMove.qScore)
     : [0];
 
-  // the best score that i get aftr i move the board
+  // the best score that i get after i move the board
   const optimalFutureReward = -Math.max(...scores);
 
   // populate qscores
@@ -46,7 +46,8 @@ const calculateQScore = async (
 
   // adding predict value to existing value, if existing value is not zero, this
   // will accumulate as this spot is being visited more and more
-  chessMove.qScore = predictValue + 0.01 * oQScore;
+  // chessMove.qScore = predictValue + 0.01 * oQScore;
+  chessMove.qScore = predictValue;
 
   // const addValue = ALPHA * (reward + GAMMA * optimalFutureReward - oQScore);
   // chessMove.qScore += addValue;
