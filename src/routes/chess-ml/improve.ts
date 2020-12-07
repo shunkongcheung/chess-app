@@ -97,7 +97,7 @@ const improve = async (connection: Connection, query: Query) => {
     )
   );
 
-  calculateQScore(connection, moveSequences);
+  calculateQScore(connection, moveSequences.reverse());
 
   return { id: gameSeries.id };
 };
