@@ -1,4 +1,5 @@
 import React, { memo } from "react";
+import Link from "next/link";
 import styled from "styled-components";
 
 import { Side } from "../../constants";
@@ -107,7 +108,11 @@ const GameSeries: React.FC<GameSeriesProps> = ({ moveSequences }) => {
             Forward
           </Button>
         </ControlContainer>
-        <pre>{getHashFromBoard(board)}</pre>
+        <Link href={`/board-checker/${getHashFromBoard(board)}`}>
+          <a target="_blank" rel="noreferrer">
+            Board Check
+          </a>
+        </Link>
       </ChessCol>
       <MoveCol>
         <ListItemGroup>
