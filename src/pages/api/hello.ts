@@ -1,10 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { MoreThan, LessThan, Connection } from "typeorm";
+import { Connection } from "typeorm";
 import * as yup from "yup";
+import moment from "moment";
 
-import { getBoardFromHash } from "../../chess";
 import { Side } from "../../constants";
-import { ChessMove } from "../../entities";
 import chessdb from "../../routes/chessdb";
 import { getDbConnection } from "../../utils";
 
@@ -36,10 +35,15 @@ import { getDbConnection } from "../../utils";
  *       - name: round
  *         type: number
  *         in: formData
- *         required: true
- *         default: 20
+ *         required: false
  *         min: 1
  *         description: repeat from this start board for # of times
+ *       - name: till
+ *         type: datetime
+ *         in: formData
+ *         required: false
+ *         min: 1
+ *         description: repeat until this time
  *       - name: board
  *         type: string
  *         in: formData
@@ -52,34 +56,29 @@ import { getDbConnection } from "../../utils";
  *           type: object
  *
  */
+interface Query {
+  side: Side;
+  steps: number;
+  board?: string;
+}
 
-const getBoard = async (conn: Connection, side: Side, boardHash?: string) => {
-  if (boardHash) return getBoardFromHash(boardHash);
+const runRound = async (conn: Connection, countDown: number, query: Query) => {
+  const { id } = await chessdb(conn, query);
+  console.log(`Run as round: ${countDown} remaining. ${id} created.`);
+  if (countDown - 1 > 0) return runRound(conn, countDown - 1, query);
+  else console.log("Run as round finished");
+};
 
-  const chessMoveRepo = conn.getRepository(ChessMove);
-  const chessMoves = await chessMoveRepo.find({
-    relations: ["fromBoard"],
-    where: [
-      { qScore: MoreThan(100), side },
-      { qScore: LessThan(-100), side },
-    ],
-    take: 100,
-  });
-  if (chessMoves.length) {
-    // try updating move that are higher than 100
-    // should have a lot of them in production database
-    const index = Math.floor(Math.random() * chessMoves.length);
-    const chessMove = chessMoves[index];
-    return getBoardFromHash(chessMove.fromBoard.board);
-  } else {
-    // if none exist
-    const chessMoves = await chessMoveRepo.find({
-      relations: ["fromBoard"],
-      where: { side },
-    });
-    const index = Math.floor(Math.random() * chessMoves.length);
-    return getBoardFromHash(chessMoves[index].fromBoard.board);
-  }
+const runTill = async (conn: Connection, till: Date, query: Query) => {
+  const current = moment();
+  const timer = moment(till).format("MM-DD HH:mm");
+  if (moment(current).isBefore(moment(till))) {
+    const start = moment().format("MM-DD HH:mm");
+    const { id } = await chessdb(conn, query);
+    console.log(`Run until: ${start} ${timer} remaining. ${id} created.`);
+
+    return runTill(conn, till, query);
+  } else console.log(`Run until ${timer} finished`);
 };
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -90,17 +89,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const schema = yup.object({
       side: yup.string().oneOf(Object.values(Side)).required(),
       steps: yup.number().min(1).required(),
-      round: yup.number().min(1).required(),
+      round: yup.number().min(1).optional(),
+      till: yup.date().optional(),
       board: yup.string().optional(),
     });
-    const query = await schema.validate(req.body);
-    const { round, board: boardHash } = query;
-    await Promise.all(
-      Array.from({ length: round }).map(async () => {
-        const board = await getBoard(conn, query.side, boardHash);
-        await chessdb(conn, { ...query, board });
-      })
-    );
+    const { round, till, ...query } = await schema.validate(req.body);
+
+    if (round) runRound(conn, round, query);
+    else if (till) runTill(conn, till, query);
+    else await chessdb(conn, query);
+
     return res.status(200).json(query);
   } else {
     return res.status(404).json({ message: "Method not found." });
