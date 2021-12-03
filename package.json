@@ -5,20 +5,26 @@
   "scripts": {
     "build": "npm run clean && tsc",
     "clean": "if [ -d \"dist\" ]; then rm -Rf dist; fi",
-    "db:generate": "npm run clean && npm run build && typeorm migration:generate -n ",
-    "db:create": "typeorm migration:create -n ",
-    "db:run": "npm run clean && yarn build && typeorm migration:run",
-    "db:revert": "npm run clean && npm run build && typeorm migration:revert",
-    "start": "node ./dist/index.js"
+    "start": "node ./dist/index.js",
+    "dev": "nodemon --watch 'src/**/*' -e ts --exec 'npm run build && npm start'"
   },
   "dependencies": {
+    "apollo-server-express": "^3.5.0",
+    "class-validator": "^0.13.2",
+    "express": "^4.17.1",
+    "graphql": "15.5.1",
     "pg": "^8.4.2",
+    "reflect-metadata": "^0.1.13",
     "short-hash": "^1.0.0",
+    "type-graphql": "^1.1.1",
+    "type-graphql-dataloader": "^0.5.0",
     "typeorm": "^0.2.29"
   },
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.12.1",
+    "@types/express": "^4.17.13",
     "@types/node": "^14.14.6",
+    "nodemon": "^2.0.15",
     "prettier": "^2.1.2",
     "typescript": "^4.0.5"
   }
