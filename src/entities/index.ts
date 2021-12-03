@@ -1,3 +1,4 @@
-import ChessBoard from "./ChessBoard"
+import ChessBoard from "./ChessBoard";
+import ChessMove from "./ChessMove";
 
-export { ChessBoard };
+export { ChessBoard, ChessMove };
