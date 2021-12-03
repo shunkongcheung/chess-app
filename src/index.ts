@@ -1,14 +1,38 @@
-import { Side } from "./constants";
-import { getInitialBoard } from "./chess";
+import "reflect-metadata";
+
+import { ApolloServer } from "apollo-server-express";
+import dotenv from "dotenv";
+import express from "express";
+import http from "http";
+import { buildSchema } from "type-graphql";
+
+import * as Resolvers from "./resolvers";
 import getDbConnection from "./getDbConnection";
-import { insertChessBoards } from "./services";
 
 const start = async () => {
-  const conn = await getDbConnection();
+  // read .env file into process.env
+  dotenv.config();
 
-  // create initial board
-  const initialBoard = getInitialBoard();
-  const saved = await insertChessBoards(conn, [initialBoard], Side.Bottom);
+  const PORT = process.env.PORT;
+
+  const app = express();
+  const httpServer = http.createServer(app);
+
+  await getDbConnection();
+
+  // create apollo instance
+  const schema = await buildSchema({
+    resolvers: Object.values(Resolvers) as any,
+  });
+  const server = new ApolloServer({ schema });
+
+  await server.start();
+
+  server.applyMiddleware({ app });
+  await new Promise<void>((resolve) =>
+    httpServer.listen({ port: PORT }, resolve)
+  );
+  console.log(`🚀 Server ready at ${server.graphqlPath}`);
 };
 
 start();
