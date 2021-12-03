@@ -1,3 +1,3 @@
-import insertChessBoard from "./insertChessBoard";
+import insertChessBoards from "./insertChessBoards";
 
-export { insertChessBoard };
+export { insertChessBoards };
