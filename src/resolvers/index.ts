@@ -1,3 +1,4 @@
+import ChessBoardResolver from "./ChessBoardResolver";
 import DataGeneratorResolver from "./DataGeneratorResolver";
 
-export { DataGeneratorResolver };
+export { ChessBoardResolver, DataGeneratorResolver };

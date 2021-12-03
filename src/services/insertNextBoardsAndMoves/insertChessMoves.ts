@@ -29,7 +29,7 @@ const insertChessMoves = async (
       toCol: move.to[1],
       toPiece: unmovedBoard[move.to[0]][move.to[1]].toUpperCase() as Piece,
       fromBoard: unmovedChessBoard,
-      to: chessBoards.find((itm) => itm.board === boardStr),
+      toBoard: chessBoards.find((itm) => itm.board === boardStr),
       movedBy: unmovedChessBoard.toBeMovedBy,
       qScore: 0,
     };
