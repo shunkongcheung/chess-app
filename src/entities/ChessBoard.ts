@@ -1,3 +1,4 @@
+import { Piece, Side } from "../constants";
 import { Column, PrimaryGeneratedColumn, Entity, Index } from "typeorm";
 
 @Entity()
@@ -16,13 +17,20 @@ class ChessBoard {
 
   // score calculated based on board current situation
   @Column({ type: "integer" })
-  boardScore: number;
+  score: number;
 
-  // expected score base on next moves
-  // calculated recursively
-  // score 0 indicates value is not calculated
-  @Column({ type: "integer" })
-  expectedScore: number;
+  // indicate the board should be moved by upper side or lower side
+  // always starts moving by lower side
+  // i.e. initial board's toBeMovedBy = lowerSide
+  @Column({
+    type: "enum",
+    enum: Object.values(Side),
+  })
+  toBeMovedBy: Side;
+
+  // flag to indicate if this board's next movement has been calculated
+  @Column({ default: false })
+  isMoved: boolean;
 }
 
 export default ChessBoard;
