@@ -17,7 +17,7 @@ const getDbConnection = async () => {
     password: process.env.TYPEORM_PASSWORD,
     database: process.env.TYPEORM_DATABASE,
     entities: Object.values(Entities),
-    logging: true,
+    logging: false,
   });
 
   await connection.connect();
