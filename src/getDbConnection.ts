@@ -1,4 +1,4 @@
-import { createConnection, getConnectionManager, Connection } from "typeorm";
+import { getConnectionManager, Connection } from "typeorm";
 import dotenv from "dotenv";
 
 import * as Entities from "./entities";
@@ -17,11 +17,11 @@ const getDbConnection = async () => {
     password: process.env.TYPEORM_PASSWORD,
     database: process.env.TYPEORM_DATABASE,
     entities: Object.values(Entities),
-    logging: true,
+    logging: false,
   });
 
   await connection.connect();
-  await connection.synchronize(); 
+  await connection.synchronize();
 
   return connection;
 };
