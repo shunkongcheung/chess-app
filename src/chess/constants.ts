@@ -1,8 +1,0 @@
-export const CHS_EMPTY = '_'
-export const CHS_CANNON = 'A'
-export const CHS_CASTLE = 'C'
-export const CHS_GENERAL = 'G'
-export const CHS_HORSE = 'H'
-export const CHS_JUMBO = 'J'
-export const CHS_KNIGHT = 'K'
-export const CHS_SOLDIER = 'S'
