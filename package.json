@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "pg": "^8.4.2",
+    "short-hash": "^1.0.0",
     "typeorm": "^0.2.29"
   },
   "devDependencies": {
