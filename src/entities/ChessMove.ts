@@ -14,6 +14,9 @@ class ChessMove {
   @PrimaryGeneratedColumn()
   id: number;
 
+  /**
+   * movement information
+   */
   @Column({ type: "integer" })
   fromRow: number;
 
@@ -38,8 +41,14 @@ class ChessMove {
   @ManyToOne(() => ChessBoard, { onDelete: "CASCADE" })
   toBoard: ChessBoard;
 
+  /**
+   * calculated scores
+   */
   @Column({ type: "enum", enum: Object.values(Side) })
-  side: Side;
+  movedBy: Side;
+
+  @Column({ type: "integer" })
+  qScore: number;
 }
 
 export default ChessMove;
