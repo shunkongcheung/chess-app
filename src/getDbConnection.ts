@@ -1,4 +1,4 @@
-import { createConnection, getConnectionManager, Connection } from "typeorm";
+import { getConnectionManager, Connection } from "typeorm";
 import dotenv from "dotenv";
 
 import * as Entities from "./entities";
@@ -21,7 +21,7 @@ const getDbConnection = async () => {
   });
 
   await connection.connect();
-  await connection.synchronize(); 
+  await connection.synchronize();
 
   return connection;
 };
