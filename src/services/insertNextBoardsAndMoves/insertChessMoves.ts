@@ -41,6 +41,7 @@ const insertChessMoves = async (
     .insert()
     .into(ChessMove)
     .values(moveWithChessBoards)
+    .orIgnore()
     .execute();
 };
 
